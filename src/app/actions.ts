@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Effort, Outcome, Priority, Status } from "@prisma/client";
 import { db } from "@/lib/db";
+import { isClaudeProjectUrl } from "@/lib/start";
 import { parseTags } from "@/lib/tags";
 import {
   SESSION_COOKIE,
@@ -47,6 +48,11 @@ function optionalFields(formData: FormData) {
   };
 }
 
+function validProjectUrl(formData: FormData) {
+  const url = String(formData.get("claudeProjectUrl") ?? "").trim();
+  return url && isClaudeProjectUrl(url) ? url : null;
+}
+
 export async function addIdea(formData: FormData) {
   const text = String(formData.get("text") ?? "").trim();
   if (!text) return;
@@ -65,6 +71,7 @@ export async function updateIdea(id: string, formData: FormData) {
     data: {
       text,
       ...optionalFields(formData),
+      ...(formData.has("claudeProjectUrl") ? { claudeProjectUrl: validProjectUrl(formData) } : {}),
       ...(status in Status ? { status: status as Status } : {}),
     },
   });
@@ -88,4 +95,14 @@ export async function archiveIdea(id: string, outcome: string) {
 export async function unarchiveIdea(id: string) {
   await db.idea.update({ where: { id }, data: { outcome: null, archivedAt: null } });
   revalidatePath("/");
+}
+
+export async function setProjectLink(id: string, formData: FormData): Promise<string | null> {
+  const url = String(formData.get("claudeProjectUrl") ?? "").trim();
+  if (url && !isClaudeProjectUrl(url)) {
+    return "That doesn't look like a Claude project link (https://claude.ai/project/…)";
+  }
+  await db.idea.update({ where: { id }, data: { claudeProjectUrl: url || null } });
+  revalidatePath("/");
+  return null;
 }

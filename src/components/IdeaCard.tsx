@@ -4,7 +4,10 @@ import { useState } from "react";
 import { archiveIdea, deleteIdea, unarchiveIdea, updateIdea } from "@/app/actions";
 import Link from "next/link";
 import { EFFORT_LABELS, OUTCOME_LABELS, PRIORITY_LABELS, STATUS_LABELS } from "@/lib/labels";
+import { chatLink, interviewPrompt, projectPackage } from "@/lib/start";
+import CopyButton from "./CopyButton";
 import OptionalFields from "./OptionalFields";
+import StartPanel from "./StartPanel";
 import { buttonStyle, ghostButtonStyle, inputStyle } from "./ui";
 
 export type IdeaView = {
@@ -17,6 +20,8 @@ export type IdeaView = {
   effort: string | null;
   nextStep: string | null;
   outcome: string | null;
+  claudeProjectUrl: string | null;
+  brief: string | null;
   archivedAt: string | null;
   createdAt: string;
 };
@@ -24,6 +29,7 @@ export type IdeaView = {
 export default function IdeaCard({ idea }: { idea: IdeaView }) {
   const [editing, setEditing] = useState(false);
   const [archiving, setArchiving] = useState(false);
+  const [starting, setStarting] = useState(false);
 
   const cardStyle = {
     background: "#1f2937",
@@ -51,6 +57,12 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
             priority: idea.priority,
             effort: idea.effort,
           }}
+        />
+        <input
+          name="claudeProjectUrl"
+          defaultValue={idea.claudeProjectUrl ?? ""}
+          placeholder="Claude project link (https://claude.ai/project/…)"
+          style={inputStyle}
         />
         <select name="status" defaultValue={idea.status} style={inputStyle}>
           {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -92,6 +104,15 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
         <span>· {new Date(idea.createdAt).toLocaleDateString()}</span>
       </div>
       {idea.nextStep && <p style={{ margin: 0, fontSize: 14 }}>➡️ {idea.nextStep}</p>}
+      {idea.brief && (
+        <details>
+          <summary style={{ cursor: "pointer", fontSize: 14 }}>Brief</summary>
+          <p style={{ whiteSpace: "pre-wrap", fontSize: 14, margin: "8px 0 0" }}>{idea.brief}</p>
+        </details>
+      )}
+      {starting && !idea.claudeProjectUrl && (
+        <StartPanel ideaId={idea.id} pkg={projectPackage(idea)} onClose={() => setStarting(false)} />
+      )}
       {archiving ? (
         <form
           style={{ display: "flex", gap: 8 }}
@@ -114,6 +135,24 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
         </form>
       ) : (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {!idea.archivedAt &&
+            (idea.claudeProjectUrl ? (
+              <>
+                <a
+                  href={chatLink(idea.claudeProjectUrl, idea)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ ...buttonStyle, textDecoration: "none" }}
+                >
+                  Start
+                </a>
+                <CopyButton text={interviewPrompt(idea)} label="Copy prompt" />
+              </>
+            ) : (
+              <button style={buttonStyle} onClick={() => setStarting((v) => !v)}>
+                Start
+              </button>
+            ))}
           <button style={ghostButtonStyle} onClick={() => setEditing(true)}>
             Edit
           </button>
