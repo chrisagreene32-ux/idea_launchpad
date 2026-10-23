@@ -10,8 +10,6 @@ type StartIdea = {
   nextStep: string | null;
 };
 
-const LINK_TEXT_LIMIT = 1500;
-
 function shorten(text: string, max: number) {
   const clean = text.replace(/\s+/g, " ").trim();
   return clean.length > max ? `${clean.slice(0, max - 1).trimEnd()}…` : clean;
@@ -38,8 +36,8 @@ export function projectPackage(idea: StartIdea) {
   };
 }
 
-export function interviewPrompt(idea: StartIdea, opts: { forLink?: boolean } = {}) {
-  const text = opts.forLink ? shorten(idea.text, LINK_TEXT_LIMIT) : idea.text.trim();
+export function interviewPrompt(idea: StartIdea) {
+  const text = idea.text.trim();
   const details = [
     idea.project && `Project name: ${idea.project}`,
     idea.tags.length > 0 && `Tags: ${idea.tags.join(", ")}`,
@@ -59,13 +57,6 @@ export function interviewPrompt(idea: StartIdea, opts: { forLink?: boolean } = {
     "",
     `When we're done, summarize it as a short brief and save it to this idea with the Idea Launchpad connector (add_brief tool, idea id ${idea.id}). If the connector isn't available, show me the brief so I can copy it.`,
   ].join("\n");
-}
-
-// Opening a chat inside a project through a link is unofficial, so the app also
-// offers Copy Prompt as a fallback.
-export function chatLink(projectUrl: string, idea: StartIdea) {
-  const base = projectUrl.split("?")[0];
-  return `${base}?q=${encodeURIComponent(interviewPrompt(idea, { forLink: true }))}`;
 }
 
 export function isClaudeProjectUrl(value: string) {

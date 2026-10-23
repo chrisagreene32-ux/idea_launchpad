@@ -4,9 +4,10 @@ import { useState } from "react";
 import { archiveIdea, deleteIdea, unarchiveIdea, updateIdea } from "@/app/actions";
 import Link from "next/link";
 import { EFFORT_LABELS, OUTCOME_LABELS, PRIORITY_LABELS, STATUS_LABELS } from "@/lib/labels";
-import { chatLink, interviewPrompt, projectPackage } from "@/lib/start";
+import { interviewPrompt, projectPackage } from "@/lib/start";
 import CopyButton from "./CopyButton";
 import OptionalFields from "./OptionalFields";
+import StartLink from "./StartLink";
 import StartPanel from "./StartPanel";
 import { buttonStyle, ghostButtonStyle, inputStyle } from "./ui";
 
@@ -138,14 +139,7 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
           {!idea.archivedAt &&
             (idea.claudeProjectUrl ? (
               <>
-                <a
-                  href={chatLink(idea.claudeProjectUrl, idea)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ ...buttonStyle, textDecoration: "none" }}
-                >
-                  Start
-                </a>
+                <StartLink projectUrl={idea.claudeProjectUrl} prompt={interviewPrompt(idea)} />
                 <CopyButton text={interviewPrompt(idea)} label="Copy prompt" />
               </>
             ) : (
