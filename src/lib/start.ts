@@ -31,6 +31,7 @@ export function projectPackage(idea: StartIdea) {
       "- Keep questions short and plain. I have ADHD, so avoid long lists and big walls of text.",
       "- Cover, in order: the problem and who it's for; the smallest useful first version; tools and other projects it connects to; what success looks like; the very first step.",
       "- Finish with a short brief (a few bullet points), then save it to the idea with the Idea Launchpad connector's add_brief tool.",
+      "- Also estimate the effort (quick win, a few hours, or big project) and the priority (high, medium or low), with a one-line reason, and save them with the connector's set_effort_and_priority tool. I can change them later.",
       "- Never start an interview unless I ask for one.",
     ].join("\n"),
   };
@@ -55,7 +56,7 @@ export function interviewPrompt(idea: StartIdea) {
     "",
     "Cover these in order: (1) the problem and who it's for, (2) the smallest useful first version, (3) tools and other projects it connects to, (4) what success looks like, (5) the very first step.",
     "",
-    `When we're done, summarize it as a short brief and save it to this idea with the Idea Launchpad connector (add_brief tool, idea id ${idea.id}). If the connector isn't available, show me the brief so I can copy it.`,
+    `When we're done, summarize it as a short brief and save it to this idea with the Idea Launchpad connector (add_brief tool, idea id ${idea.id}). Then estimate the effort (quick win, a few hours, or big project) and priority (high, medium or low), say why in one line, and save them with set_effort_and_priority. If the connector isn't available, show me the brief and your estimates so I can copy them.`,
   ].join("\n");
 }
 

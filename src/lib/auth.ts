@@ -3,7 +3,7 @@
 export const SESSION_COOKIE = "lp_session";
 export const SESSION_DAYS = 90;
 
-async function sign(value: string): Promise<string> {
+export async function sign(value: string): Promise<string> {
   const secret = process.env.SESSION_SECRET;
   if (!secret) throw new Error("SESSION_SECRET is not set");
   const key = await crypto.subtle.importKey(
@@ -17,7 +17,7 @@ async function sign(value: string): Promise<string> {
   return Array.from(new Uint8Array(mac), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function safeEqual(a: string, b: string): boolean {
+export function safeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
