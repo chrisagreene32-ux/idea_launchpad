@@ -16,12 +16,27 @@ enum Status {
   DONE
 }
 
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum Effort {
+  QUICK_WIN
+  FEW_HOURS
+  BIG_PROJECT
+}
+
 model Idea {
   id        String   @id @default(cuid())
   text      String
   tags      String[] @default([])
   status    Status   @default(NEW)
   project   String?
+  priority  Priority?
+  effort    Effort?
+  nextStep  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
