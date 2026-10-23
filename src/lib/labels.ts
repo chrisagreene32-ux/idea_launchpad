@@ -17,3 +17,15 @@ export const EFFORT_LABELS: Record<string, string> = {
   FEW_HOURS: "A few hours",
   BIG_PROJECT: "Big project",
 };
+
+export const OUTCOME_LABELS: Record<string, string> = {
+  SHIPPED: "Shipped",
+  PARKED: "Parked",
+  ABANDONED: "Abandoned",
+};
+
+export const VIEW_LABELS: Record<string, string> = {
+  active: "Active ideas",
+  archived: "Archived",
+  all: "Everything",
+};

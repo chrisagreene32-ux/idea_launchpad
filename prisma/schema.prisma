@@ -28,15 +28,23 @@ enum Effort {
   BIG_PROJECT
 }
 
+enum Outcome {
+  SHIPPED
+  PARKED
+  ABANDONED
+}
+
 model Idea {
-  id        String   @id @default(cuid())
-  text      String
-  tags      String[] @default([])
-  status    Status   @default(NEW)
-  project   String?
-  priority  Priority?
-  effort    Effort?
-  nextStep  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  id         String    @id @default(cuid())
+  text       String
+  tags       String[]  @default([])
+  status     Status    @default(NEW)
+  project    String?
+  priority   Priority?
+  effort     Effort?
+  nextStep   String?
+  outcome    Outcome?
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
 }
