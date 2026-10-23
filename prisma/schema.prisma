@@ -8,8 +8,20 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Status {
+  NEW
+  INTERVIEWED
+  BUILDING
+  PARKED
+  DONE
+}
+
 model Idea {
   id        String   @id @default(cuid())
   text      String
+  tags      String[] @default([])
+  status    Status   @default(NEW)
+  project   String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
