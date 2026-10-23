@@ -1,22 +1,30 @@
 import { db } from "@/lib/db";
+import CaptureForm from "@/components/CaptureForm";
+import IdeaCard from "@/components/IdeaCard";
+import { logout } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-async function databaseConnected() {
-  try {
-    await db.$queryRaw`SELECT 1`;
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export default async function Home() {
-  const connected = await databaseConnected();
+  const ideas = await db.idea.findMany({ orderBy: { createdAt: "desc" } });
+
   return (
-    <main style={{ padding: 24, textAlign: "center" }}>
-      <h1>Idea Launchpad is running ✅</h1>
-      <p>{connected ? "Database connected ✅" : "Database not connected yet ⚠️"}</p>
+    <main style={{ padding: 16, maxWidth: 640, margin: "0 auto", display: "grid", gap: 16 }}>
+      <CaptureForm />
+      <h2 style={{ margin: "8px 0 0", fontSize: 16, color: "#9ca3af" }}>
+        {ideas.length} {ideas.length === 1 ? "idea" : "ideas"}
+      </h2>
+      {ideas.map((idea) => (
+        <IdeaCard
+          key={idea.id}
+          idea={{ ...idea, createdAt: idea.createdAt.toISOString() }}
+        />
+      ))}
+      <form action={logout}>
+        <button style={{ background: "none", border: "none", color: "#6b7280", padding: 8 }}>
+          Lock
+        </button>
+      </form>
     </main>
   );
 }
