@@ -2,15 +2,10 @@
 
 import { useState } from "react";
 import { deleteIdea, updateIdea } from "@/app/actions";
+import Link from "next/link";
+import { EFFORT_LABELS, PRIORITY_LABELS, STATUS_LABELS } from "@/lib/labels";
+import OptionalFields from "./OptionalFields";
 import { buttonStyle, ghostButtonStyle, inputStyle } from "./ui";
-
-export const STATUS_LABELS: Record<string, string> = {
-  NEW: "New",
-  INTERVIEWED: "Interviewed",
-  BUILDING: "Building",
-  PARKED: "Parked",
-  DONE: "Done",
-};
 
 export type IdeaView = {
   id: string;
@@ -18,6 +13,9 @@ export type IdeaView = {
   tags: string[];
   status: string;
   project: string | null;
+  priority: string | null;
+  effort: string | null;
+  nextStep: string | null;
   createdAt: string;
 };
 
@@ -42,8 +40,15 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
         }}
       >
         <textarea name="text" defaultValue={idea.text} required rows={4} style={inputStyle} />
-        <input name="tags" defaultValue={idea.tags.join(" ")} placeholder="Tags" style={inputStyle} />
-        <input name="project" defaultValue={idea.project ?? ""} placeholder="Project name" style={inputStyle} />
+        <OptionalFields
+          defaults={{
+            tags: idea.tags.join(" "),
+            project: idea.project ?? "",
+            nextStep: idea.nextStep ?? "",
+            priority: idea.priority,
+            effort: idea.effort,
+          }}
+        />
         <select name="status" defaultValue={idea.status} style={inputStyle}>
           {Object.entries(STATUS_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
@@ -66,12 +71,21 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
       <p style={{ margin: 0, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{idea.text}</p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, fontSize: 13, color: "#9ca3af" }}>
         <span>{STATUS_LABELS[idea.status]}</span>
-        {idea.project && <span>· 📁 {idea.project}</span>}
+        {idea.priority && <span>· {PRIORITY_LABELS[idea.priority]} priority</span>}
+        {idea.effort && <span>· {EFFORT_LABELS[idea.effort]}</span>}
+        {idea.project && (
+          <Link href={`/?project=${encodeURIComponent(idea.project)}`} style={{ color: "inherit" }}>
+            · 📁 {idea.project}
+          </Link>
+        )}
         {idea.tags.map((t) => (
-          <span key={t}>#{t}</span>
+          <Link key={t} href={`/?tag=${encodeURIComponent(t)}`} style={{ color: "inherit" }}>
+            #{t}
+          </Link>
         ))}
         <span>· {new Date(idea.createdAt).toLocaleDateString()}</span>
       </div>
+      {idea.nextStep && <p style={{ margin: 0, fontSize: 14 }}>➡️ {idea.nextStep}</p>}
       <div style={{ display: "flex", gap: 8 }}>
         <button style={ghostButtonStyle} onClick={() => setEditing(true)}>
           Edit

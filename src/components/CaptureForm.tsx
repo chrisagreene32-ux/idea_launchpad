@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { addIdea } from "@/app/actions";
+import OptionalFields from "./OptionalFields";
 import { buttonStyle, inputStyle } from "./ui";
 
 export default function CaptureForm() {
@@ -28,10 +29,9 @@ export default function CaptureForm() {
         style={{ ...inputStyle, fontSize: 18 }}
       />
       <details>
-        <summary style={{ cursor: "pointer", color: "#9ca3af" }}>Tags and project (optional)</summary>
+        <summary style={{ cursor: "pointer", color: "#9ca3af" }}>More details (optional)</summary>
         <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
-          <input name="tags" placeholder="Tags, separated by spaces or commas" style={inputStyle} />
-          <input name="project" placeholder="Project name" style={inputStyle} />
+          <OptionalFields />
         </div>
       </details>
       <button disabled={saving} style={buttonStyle}>

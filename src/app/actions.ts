@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { Status } from "@prisma/client";
+import { Effort, Priority, Status } from "@prisma/client";
 import { db } from "@/lib/db";
 import { parseTags } from "@/lib/tags";
 import {
@@ -32,15 +32,26 @@ export async function logout() {
   redirect("/login");
 }
 
+function enumOrNull<T extends string>(values: Record<string, T>, raw: FormDataEntryValue | null) {
+  const value = String(raw ?? "");
+  return value in values ? values[value] : null;
+}
+
+function optionalFields(formData: FormData) {
+  return {
+    tags: parseTags(String(formData.get("tags") ?? "")),
+    project: String(formData.get("project") ?? "").trim() || null,
+    nextStep: String(formData.get("nextStep") ?? "").trim() || null,
+    priority: enumOrNull(Priority, formData.get("priority")),
+    effort: enumOrNull(Effort, formData.get("effort")),
+  };
+}
+
 export async function addIdea(formData: FormData) {
   const text = String(formData.get("text") ?? "").trim();
   if (!text) return;
   await db.idea.create({
-    data: {
-      text,
-      tags: parseTags(String(formData.get("tags") ?? "")),
-      project: String(formData.get("project") ?? "").trim() || null,
-    },
+    data: { text, ...optionalFields(formData) },
   });
   revalidatePath("/");
 }
@@ -53,8 +64,7 @@ export async function updateIdea(id: string, formData: FormData) {
     where: { id },
     data: {
       text,
-      tags: parseTags(String(formData.get("tags") ?? "")),
-      project: String(formData.get("project") ?? "").trim() || null,
+      ...optionalFields(formData),
       ...(status in Status ? { status: status as Status } : {}),
     },
   });
