@@ -21,7 +21,10 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
     tag: first(params.tag),
     project: first(params.project),
     status: first(params.status) in Status ? first(params.status) : "",
+    view: ["active", "archived", "all"].includes(first(params.view)) ? first(params.view) : "",
   };
+  // Archived ideas stay out of the main list but a text search looks everywhere.
+  const view = filters.view || (filters.q ? "all" : "active");
 
   const where: Prisma.IdeaWhereInput = {
     AND: [
@@ -38,6 +41,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       filters.tag ? { tags: { has: filters.tag } } : {},
       filters.project ? { project: { equals: filters.project, mode: "insensitive" } } : {},
       filters.status ? { status: filters.status as Status } : {},
+      view === "active" ? { archivedAt: null } : view === "archived" ? { archivedAt: { not: null } } : {},
     ],
   };
 
@@ -58,7 +62,11 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         {filtered && " match"}
       </h2>
       {ideas.map((idea) => (
-        <IdeaCard key={idea.id} idea={{ ...idea, createdAt: idea.createdAt.toISOString() }} />
+        <IdeaCard key={idea.id} idea={{
+            ...idea,
+            createdAt: idea.createdAt.toISOString(),
+            archivedAt: idea.archivedAt?.toISOString() ?? null,
+          }} />
       ))}
       <form action={logout}>
         <button style={{ background: "none", border: "none", color: "#6b7280", padding: 8 }}>

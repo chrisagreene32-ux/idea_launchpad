@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { STATUS_LABELS } from "@/lib/labels";
+import { STATUS_LABELS, VIEW_LABELS } from "@/lib/labels";
 import { buttonStyle, ghostButtonStyle, inputStyle } from "./ui";
 
-export type Filters = { q: string; tag: string; project: string; status: string };
+export type Filters = { q: string; tag: string; project: string; status: string; view: string };
 
 export default function FilterBar({
   filters,
@@ -17,6 +17,17 @@ export default function FilterBar({
   return (
     <form method="GET" style={{ display: "grid", gap: 8 }}>
       <input name="q" defaultValue={filters.q} placeholder="Search ideas…" type="search" style={inputStyle} />
+      <select name="view" defaultValue={filters.view} aria-label="Show" style={inputStyle}>
+        <option value="">{filters.q ? "Search everything" : VIEW_LABELS.active}</option>
+        {Object.entries(VIEW_LABELS)
+          .filter(([v]) => v !== "active")
+          .map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
+          ))}
+        <option value="active">{VIEW_LABELS.active} only</option>
+      </select>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
         <select name="status" defaultValue={filters.status} aria-label="Status" style={inputStyle}>
           <option value="">Any status</option>

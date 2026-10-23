@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { Effort, Priority, Status } from "@prisma/client";
+import { Effort, Outcome, Priority, Status } from "@prisma/client";
 import { db } from "@/lib/db";
 import { parseTags } from "@/lib/tags";
 import {
@@ -73,5 +73,19 @@ export async function updateIdea(id: string, formData: FormData) {
 
 export async function deleteIdea(id: string) {
   await db.idea.delete({ where: { id } });
+  revalidatePath("/");
+}
+
+export async function archiveIdea(id: string, outcome: string) {
+  if (!(outcome in Outcome)) return;
+  await db.idea.update({
+    where: { id },
+    data: { outcome: outcome as Outcome, archivedAt: new Date() },
+  });
+  revalidatePath("/");
+}
+
+export async function unarchiveIdea(id: string) {
+  await db.idea.update({ where: { id }, data: { outcome: null, archivedAt: null } });
   revalidatePath("/");
 }
