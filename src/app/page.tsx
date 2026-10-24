@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { db } from "@/lib/db";
@@ -55,6 +56,11 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
   return (
     <main style={{ padding: 16, maxWidth: 640, margin: "0 auto", display: "grid", gap: 16 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Link href="/mission" style={{ color: "#a5b4fc" }}>
+          Mission Control →
+        </Link>
+      </div>
       <CaptureForm />
       <FilterBar filters={filters} tags={tags} projects={projects} />
       <h2 style={{ margin: "8px 0 0", fontSize: 16, color: "#9ca3af" }}>

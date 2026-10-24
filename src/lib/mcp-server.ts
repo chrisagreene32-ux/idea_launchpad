@@ -3,6 +3,16 @@ import { Effort, Priority, Status, type Idea, type Prisma } from "@prisma/client
 import { z } from "zod";
 import { db } from "./db";
 import { EFFORT_LABELS, OUTCOME_LABELS, PRIORITY_LABELS, STATUS_LABELS } from "./labels";
+import {
+  PEOPLE,
+  PROJECT_STATUS_LABELS,
+  SESSION_KIND_LABELS,
+  SESSION_STATUS_LABELS,
+  deadlineLabel,
+  rankProjects,
+  sessionName,
+} from "./mission";
+import { createSession, findProject, saveHandoff } from "./mission-db";
 
 const statusEnum = z.enum(Object.keys(Status) as [Status, ...Status[]]);
 const effortEnum = z.enum(Object.keys(Effort) as [Effort, ...Effort[]]);
@@ -222,6 +232,192 @@ export function createMcpServer() {
         ...(unrated ? ["", `${unrated} active idea${unrated === 1 ? " has" : "s have"} no effort estimate. Offer to rate them with set_effort_and_priority.`] : []),
       ];
       return reply(lines.join("\n"));
+    },
+  );
+
+  // ---- Mission Control: projects, numbered sessions, handoffs, baton ----
+  const personEnum = z.enum(PEOPLE);
+  const projectNotFound = (code: string) =>
+    reply(`No project found for "${code}". Use list_projects to see the codes.`, true);
+
+  server.registerTool(
+    "list_projects",
+    {
+      description:
+        "List Mission Control projects with code, name, status, who holds the baton, deadline and next action.",
+      inputSchema: { include_inactive: z.boolean().optional().describe("Include Parked and Done projects") },
+      annotations: { readOnlyHint: true },
+    },
+    async ({ include_inactive }) => {
+      const projects = await db.project.findMany({
+        where: include_inactive ? {} : { status: { in: ["ACTIVE", "WAITING"] } },
+        orderBy: { createdAt: "asc" },
+      });
+      if (!projects.length) return reply("No projects yet.");
+      return reply(
+        projects
+          .map((p) => {
+            const due = deadlineLabel(p.deadline);
+            return [
+              `- ${p.code}: ${p.name} [${PROJECT_STATUS_LABELS[p.status]}] baton: ${p.holder}${due ? ` · deadline ${due}` : ""}`,
+              p.nextAction && `  next: ${p.nextAction}`,
+              p.blockedOn && `  blocked on: ${p.blockedOn}`,
+            ]
+              .filter(Boolean)
+              .join("\n");
+          })
+          .join("\n"),
+      );
+    },
+  );
+
+  server.registerTool(
+    "get_project",
+    {
+      description:
+        "Get one project by code (for example SCHED): details, next action, blockers, the latest handoff and the last few sessions. Call this at the start of a chat to pick up where the last session left off.",
+      inputSchema: { code: z.string().describe("Project code, such as SCHED") },
+      annotations: { readOnlyHint: true },
+    },
+    async ({ code }) => {
+      const project = await findProject(code);
+      if (!project) return projectNotFound(code);
+      const sessions = await db.session.findMany({
+        where: { projectId: project.id },
+        orderBy: { seq: "desc" },
+        take: 6,
+      });
+      const latest = sessions.find((s) => s.handoff);
+      const due = deadlineLabel(project.deadline);
+      return reply(
+        [
+          `${project.code}: ${project.name}`,
+          `Status: ${PROJECT_STATUS_LABELS[project.status]}`,
+          `Baton: ${project.holder} (since ${project.batonSince.toISOString().slice(0, 10)})`,
+          `Deadline: ${due ?? "none"}`,
+          `Next action: ${project.nextAction ?? "none"}`,
+          `Blocked on: ${project.blockedOn ?? "nothing"}`,
+          `Repo: ${project.repoUrl ?? "none"}`,
+          `Claude project: ${project.claudeProjectUrl ?? "none"}`,
+          `Next chat number: ${project.nextSeq}`,
+          "",
+          "Notes:",
+          project.notes ?? "(none)",
+          "",
+          latest
+            ? `Latest handoff (${sessionName(project.code, latest.seq, latest.goal, latest.driver)}):\n${latest.handoff}`
+            : "Latest handoff: (none yet)",
+          "",
+          "Recent sessions:",
+          sessions.length
+            ? sessions
+                .map(
+                  (s) =>
+                    `- ${sessionName(project.code, s.seq, s.goal, s.driver)} · ${SESSION_KIND_LABELS[s.kind]} · ${SESSION_STATUS_LABELS[s.status]}${s.branch ? ` · branch ${s.branch}` : ""}`,
+                )
+                .join("\n")
+            : "(none)",
+        ].join("\n"),
+      );
+    },
+  );
+
+  server.registerTool(
+    "start_session",
+    {
+      description:
+        "Log a new numbered chat or Code session on a project and get the exact name to give this chat. Ask the person for a short goal and whether it is a Chat or Code session first.",
+      inputSchema: {
+        code: z.string(),
+        goal: z.string().min(1).max(80).describe("Short goal, a few words"),
+        kind: z.enum(["CHAT", "CODE"]).optional().describe("Default CHAT"),
+        driver: personEnum.optional().describe("Who is driving this session, default is the baton holder"),
+        url: z.string().optional(),
+        branch: z.string().optional(),
+      },
+    },
+    async ({ code, goal, kind, driver, url, branch }) => {
+      const project = await findProject(code);
+      if (!project) return projectNotFound(code);
+      const { name, session } = await createSession({
+        projectId: project.id,
+        goal,
+        kind: kind ?? "CHAT",
+        driver: driver ?? project.holder,
+        url,
+        branch,
+      });
+      return reply(`Session ${session.seq} logged. Name this chat exactly:\n${name}`);
+    },
+  );
+
+  server.registerTool(
+    "log_handoff",
+    {
+      description:
+        "Save the end-of-session handoff on a project. Attaches it to the latest active session (or a given session number), updates the next action and blockers, and can pass the baton. Never include real client or therapist names or other health data.",
+      inputSchema: {
+        code: z.string(),
+        handoff: z.string().min(1).max(20000).describe("What got done, what is half-done, decisions, exact branch or deploy state"),
+        next_action: z.string().max(500).optional().describe("The single next step. Empty string clears it."),
+        blocked_on: z.string().max(300).optional().describe("What the project is waiting on. Empty string clears it."),
+        baton_to: personEnum.optional(),
+        session_status: z.enum(["HANDED_OFF", "DONE"]).optional().describe("Default HANDED_OFF"),
+        session_number: z.number().int().min(1).optional().describe("Defaults to the latest active session"),
+      },
+    },
+    async ({ code, handoff, next_action, blocked_on, baton_to, session_status, session_number }) => {
+      const project = await findProject(code);
+      if (!project) return projectNotFound(code);
+      await saveHandoff({
+        projectId: project.id,
+        sessionSeq: session_number ?? null,
+        handoff,
+        nextAction: next_action,
+        blockedOn: blocked_on,
+        batonTo: baton_to ?? null,
+        sessionStatus: session_status,
+      });
+      return reply(
+        `Handoff saved on ${project.code}.${baton_to && baton_to !== project.holder ? ` Baton passed to ${baton_to}.` : ""}`,
+      );
+    },
+  );
+
+  server.registerTool(
+    "set_baton",
+    {
+      description: "Pass a project's baton to Chris or Kat.",
+      inputSchema: { code: z.string(), to: personEnum },
+    },
+    async ({ code, to }) => {
+      const project = await findProject(code);
+      if (!project) return projectNotFound(code);
+      await db.project.update({ where: { id: project.id }, data: { holder: to, batonSince: new Date() } });
+      return reply(`${project.code} baton is now with ${to}.`);
+    },
+  );
+
+  server.registerTool(
+    "mission_next",
+    {
+      description:
+        "Recommend which project to work on next. Weighs deadlines first, then who holds the baton, then how long a project has gone quiet, and sets blocked projects aside. Give `me` so the pick fits the person asking.",
+      inputSchema: { me: personEnum.optional() },
+      annotations: { readOnlyHint: true },
+    },
+    async ({ me }) => {
+      const projects = await db.project.findMany({ where: { status: "ACTIVE" } });
+      if (!projects.length) return reply("No active projects.");
+      const ranked = rankProjects(projects, me ?? null).slice(0, 4);
+      return reply(
+        ranked
+          .map(
+            (r, i) =>
+              `${i === 0 ? "Do this next" : `#${i + 1}`}: ${r.project.code} · ${r.project.name}\n  next: ${r.project.nextAction ?? "none set"}${r.reasons.length ? `\n  why: ${r.reasons.join(", ")}` : ""}`,
+          )
+          .join("\n"),
+      );
     },
   );
 
