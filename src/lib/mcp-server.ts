@@ -11,7 +11,8 @@ import {
   rankProjects,
   sessionName,
 } from "./mission";
-import { createSession, findProject, saveHandoff } from "./mission-db";
+import { createSession, findProject, normalizeCode, saveHandoff } from "./mission-db";
+import { parseTags } from "./tags";
 
 const statusEnum = z.enum(Object.keys(Status) as [Status, ...Status[]]);
 const effortEnum = z.enum(Object.keys(Effort) as [Effort, ...Effort[]]);
@@ -423,6 +424,71 @@ export function createMcpServer() {
           )
           .join("\n"),
       );
+    },
+  );
+
+  server.registerTool(
+    "add_project",
+    {
+      description:
+        "Create a new Mission Control project. Pick a short code of 2 to 8 letters or digits (for example SCHED). Use list_projects first so you don't duplicate an existing project. Never put client or therapist details in any field.",
+      inputSchema: {
+        code: z.string().min(2).max(12).describe("Short code, letters and digits only"),
+        name: z.string().min(1).max(100),
+        holder: personEnum.optional().describe("Who has it first, default Chris"),
+        deadline: z.string().optional().describe("YYYY-MM-DD"),
+        next_action: z.string().max(500).optional(),
+        notes: z.string().max(5000).optional(),
+      },
+    },
+    async ({ code, name, holder, deadline, next_action, notes }) => {
+      const clean = normalizeCode(code);
+      if (clean.length < 2) return reply("Code needs at least 2 letters or digits.", true);
+      if (await db.project.findUnique({ where: { code: clean } })) {
+        return reply(`A project with code ${clean} already exists. Use get_project ${clean}.`, true);
+      }
+      const due = deadline ? new Date(`${deadline}T12:00:00Z`) : null;
+      if (due && Number.isNaN(due.getTime())) return reply("Deadline must look like 2026-11-10.", true);
+      await db.project.create({
+        data: {
+          code: clean,
+          name: name.trim(),
+          holder: holder ?? "Chris",
+          deadline: due,
+          nextAction: next_action?.trim() || null,
+          notes: notes?.trim() || null,
+        },
+      });
+      return reply(`Project ${clean} created: ${name.trim()}.`);
+    },
+  );
+
+  server.registerTool(
+    "add_idea",
+    {
+      description:
+        "Save an idea in the Idea Launchpad list without starting a project. Use this when the person is just parking a thought. Never include client or therapist details.",
+      inputSchema: {
+        text: z.string().min(1).max(5000),
+        tags: z.array(z.string()).max(10).optional(),
+        project: z.string().max(100).optional().describe("Related project name, optional"),
+        effort: effortEnum.optional(),
+        priority: priorityEnum.optional(),
+        next_step: z.string().max(500).optional(),
+      },
+    },
+    async ({ text, tags, project, effort, priority, next_step }) => {
+      const idea = await db.idea.create({
+        data: {
+          text: text.trim(),
+          tags: parseTags((tags ?? []).join(" ")),
+          project: project?.trim() || null,
+          effort: effort ?? null,
+          priority: priority ?? null,
+          nextStep: next_step?.trim() || null,
+        },
+      });
+      return reply(`Idea saved (id ${idea.id}).`);
     },
   );
 

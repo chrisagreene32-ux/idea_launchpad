@@ -10,7 +10,7 @@ Phone-first app to capture ideas in seconds and turn them into Claude projects.
 Checks before pushing: `npm run typecheck && npm run build`.
 
 ## Claude connector (MCP)
-The app hosts a remote MCP server at `https://YOUR-SITE/api/mcp`. In Claude on the web, go to Settings → Connectors → Add custom connector and enter that address. Claude opens a sign-in page on your site; enter the app password. Tools: `list_ideas`, `get_idea`, `add_brief`, `add_note`, `set_status`, `set_effort_and_priority`, `suggest_next`, plus Mission Control: `list_projects`, `get_project`, `start_session`, `log_handoff`, `set_baton`, `mission_next`.
+The app hosts a remote MCP server at `https://YOUR-SITE/api/mcp`. In Claude on the web, go to Settings → Connectors → Add custom connector and enter that address. Claude opens a sign-in page on your site; enter the app password. Tools: `list_ideas`, `get_idea`, `add_brief`, `add_note`, `set_status`, `set_effort_and_priority`, `suggest_next`, plus Mission Control: `list_projects`, `get_project`, `start_session`, `log_handoff`, `set_baton`, `mission_next`, `add_project`, `add_idea`.
 
 Sign-in is OAuth 2.1 with PKCE. Access tokens last 1 hour and are signed with `SESSION_SECRET`; refresh tokens last 90 days and are stored hashed. Changing `SESSION_SECRET` or `APP_PASSWORD` signs everything out.
 
