@@ -5,6 +5,7 @@ Last updated: 2026-10-24
 ## Done
 - Capture, tags, priority and effort, archive with outcomes, Start button, Claude connector (steps 1-6, merged to main)
 - Mission Control built on a branch: projects, numbered sessions, baton, handoffs, do-this-next, six connector tools
+- Starter project "Roost" renamed to MysApp (code MYSAPP)
 
 ## In progress
 - Mission Control is not yet verified. The authoring sandbox could not generate the Prisma client, so typecheck and build have not run.

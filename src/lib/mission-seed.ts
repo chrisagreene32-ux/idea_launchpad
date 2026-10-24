@@ -37,11 +37,11 @@ export const STARTER_PROJECTS = [
     repoUrl: "https://github.com/chrisagreene32-ux/idea_launchpad",
   },
   {
-    code: "ROOST",
-    name: "Roost (regional burn volunteer app)",
-    nextAction: "Settle the name (Roost or Batcall) and start the build from the volunteer app spec",
+    code: "MYSAPP",
+    name: "MysApp (regional burn volunteer app)",
+    nextAction: "Start the build from the volunteer app spec (MysApp is the working name for now)",
     notes:
-      "Replaces Tribal Cities. Roles: volunteer, department lead, leadership. Tribal Cities event list caps at 50, which is a separate bug owned by its developer.",
+      "Earlier names: Roost, Batcall. Replaces Tribal Cities. Roles: volunteer, department lead, leadership. Tribal Cities event list caps at 50, which is a separate bug owned by its developer.",
   },
   {
     code: "TIFF",
