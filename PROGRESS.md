@@ -7,6 +7,7 @@ Last updated: 2026-10-24
 - Mission Control built on a branch: projects, numbered sessions, baton, handoffs, do-this-next, six connector tools
 - Starter project "Roost" renamed to MysApp (code MYSAPP)
 - Chat names now read `SCHED-014 · Code · goal · K`; chain shows dates; start_session says which chat it continues
+- Start prompt per logged session opens with a chat-title line, so a new chat gets its name automatically (title trick found by Chris)
 
 ## In progress
 - Mission Control is not yet verified. The authoring sandbox could not generate the Prisma client, so typecheck and build have not run.

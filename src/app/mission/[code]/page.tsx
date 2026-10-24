@@ -92,7 +92,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ code: 
 
       <section style={card}>
         <strong>Prompts</strong>
-        <span style={muted}>Paste at the start and the end of every chat or Code session.</span>
+        <span style={muted}>Best order: log the session below first, open it in the chain, and tap Copy start prompt. It titles the new chat for you. Paste the wrap-up prompt at the end.</span>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <CopyButton text={pickupPrompt(project.code, who)} label="Copy pickup prompt" />
           <CopyButton text={wrapUpPrompt(project.code, who)} label="Copy wrap-up prompt" />
@@ -166,6 +166,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ code: 
                     Open
                   </a>
                 )}
+                <CopyButton
+                  text={pickupPrompt(project.code, s.driver, sessionName(project.code, s.seq, s.kind, s.goal, s.driver))}
+                  label="Copy start prompt"
+                />
                 <CopyButton text={sessionName(project.code, s.seq, s.kind, s.goal, s.driver)} label="Copy name" />
               </div>
             </form>

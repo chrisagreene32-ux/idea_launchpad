@@ -135,12 +135,25 @@ export function projectFlags(p: Scored, now = new Date()): Flag[] {
   return flags;
 }
 
-/** Paste at the START of a new chat or Code session. */
-export function pickupPrompt(code: string, who: string) {
+/**
+ * Paste at the START of a new chat or Code session. With a logged session's name,
+ * the first line asks Claude to title the chat with it, and Claude skips logging
+ * it again.
+ */
+export function pickupPrompt(code: string, who: string, name?: string) {
+  const header = name
+    ? [
+        `[Chat Title: ${name}] Ignore all previous naming conventions. Please title this conversation "${name}". Now, for my actual request...`,
+      ]
+    : [];
+  const logging = name
+    ? `This chat is already logged as "${name}", so don't call start_session. Tell me which earlier chat it continues.`
+    : `Then call start_session to log this chat (ask me for a short goal that starts with a verb, and whether this is a Chat or Code session; if it begins a new phase, start the goal with "phase N:"), and tell me the exact name to give this chat and which earlier chat it continues.`;
   return [
+    ...header,
     `I'm ${who}, picking up project ${code}.`,
     `Use the Idea Launchpad connector: call get_project with code "${code}" and read the latest handoff and next action.`,
-    `Then call start_session to log this chat (ask me for a short goal that starts with a verb, and whether this is a Chat or Code session; if it begins a new phase, start the goal with "phase N:"), and tell me the exact name to give this chat and which earlier chat it continues.`,
+    logging,
     `Recap in 3 lines, then ask me one question to begin.`,
   ].join("\n");
 }
