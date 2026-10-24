@@ -103,7 +103,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ code: 
         <section style={card}>
           <strong>Latest handoff</strong>
           <span style={muted}>
-            {sessionName(project.code, latestHandoff.seq, latestHandoff.goal, latestHandoff.driver)}
+            {sessionName(project.code, latestHandoff.seq, latestHandoff.kind, latestHandoff.goal, latestHandoff.driver)}
           </span>
           <span style={{ whiteSpace: "pre-wrap", fontSize: 14 }}>{latestHandoff.handoff}</span>
         </section>
@@ -115,7 +115,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ code: 
           Next name: <code>{nextNamePattern(project, who)}</code>
         </span>
         <form action={startSession.bind(null, project.id)} style={{ display: "grid", gap: 8 }}>
-          <input name="goal" placeholder="Goal in a few words" required style={inputStyle} />
+          <input name="goal" placeholder="Goal: a verb and 2-4 words (new phase? start with phase 2:)" required style={inputStyle} />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
             <select name="kind" style={inputStyle} aria-label="Chat or Code">
               {Object.entries(SESSION_KIND_LABELS).map(([v, l]) => (
@@ -142,10 +142,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ code: 
         {sessions.map((s) => (
           <details key={s.id} style={card}>
             <summary style={{ cursor: "pointer" }}>
-              <strong>{sessionName(project.code, s.seq, s.goal, s.driver)}</strong>
+              <strong>{sessionName(project.code, s.seq, s.kind, s.goal, s.driver)}</strong>
               <span style={muted}>
                 {" "}
-                · {SESSION_KIND_LABELS[s.kind]} · {SESSION_STATUS_LABELS[s.status]}
+                · {SESSION_STATUS_LABELS[s.status]} · {dateValue(s.createdAt)}
               </span>
             </summary>
             <form action={updateSession.bind(null, s.id)} style={{ display: "grid", gap: 8, marginTop: 8 }}>
@@ -166,7 +166,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ code: 
                     Open
                   </a>
                 )}
-                <CopyButton text={sessionName(project.code, s.seq, s.goal, s.driver)} label="Copy name" />
+                <CopyButton text={sessionName(project.code, s.seq, s.kind, s.goal, s.driver)} label="Copy name" />
               </div>
             </form>
           </details>

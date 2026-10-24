@@ -41,14 +41,21 @@ export function deadlineLabel(deadline: Date | null, now = new Date()) {
   return `${date} (${d}d)`;
 }
 
-/** Chat name rule: CODE · number · goal · driver initial. Sorts by project, then order. */
-export function sessionName(code: string, seq: number, goal: string, driver: string) {
-  const initial = driver.trim().charAt(0).toUpperCase() || "?";
-  return `${code} · ${String(seq).padStart(2, "0")} · ${goal.trim() || "goal"} · ${initial}`;
+const seqLabel = (code: string, seq: number) => `${code}-${String(seq).padStart(3, "0")}`;
+const initialOf = (driver: string) => driver.trim().charAt(0).toUpperCase() || "?";
+
+/**
+ * Chat name rule: CODE-001 · Chat or Code · goal · driver initial.
+ * The padded number keeps search results in order. Start the goal with a verb,
+ * 2 to 4 words. To mark a new phase, begin it with "phase 2:".
+ */
+export function sessionName(code: string, seq: number, kind: string, goal: string, driver: string) {
+  const label = kind === "CODE" ? "Code" : "Chat";
+  return `${seqLabel(code, seq)} · ${label} · ${goal.trim() || "goal"} · ${initialOf(driver)}`;
 }
 
 export function nextNamePattern(project: Pick<Project, "code" | "nextSeq">, driver: string) {
-  return sessionName(project.code, project.nextSeq, "<goal>", driver);
+  return `${seqLabel(project.code, project.nextSeq)} · Chat or Code · <goal> · ${initialOf(driver)}`;
 }
 
 type Scored = Pick<
@@ -133,7 +140,7 @@ export function pickupPrompt(code: string, who: string) {
   return [
     `I'm ${who}, picking up project ${code}.`,
     `Use the Idea Launchpad connector: call get_project with code "${code}" and read the latest handoff and next action.`,
-    `Then call start_session to log this chat (ask me for a short goal and whether this is a Chat or Code session), and tell me the exact name to give this chat.`,
+    `Then call start_session to log this chat (ask me for a short goal that starts with a verb, and whether this is a Chat or Code session; if it begins a new phase, start the goal with "phase N:"), and tell me the exact name to give this chat and which earlier chat it continues.`,
     `Recap in 3 lines, then ask me one question to begin.`,
   ].join("\n");
 }

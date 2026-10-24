@@ -6,8 +6,7 @@ import { EFFORT_LABELS, OUTCOME_LABELS, PRIORITY_LABELS, STATUS_LABELS } from ".
 import {
   PEOPLE,
   PROJECT_STATUS_LABELS,
-  SESSION_KIND_LABELS,
-  SESSION_STATUS_LABELS,
+    SESSION_STATUS_LABELS,
   deadlineLabel,
   rankProjects,
   sessionName,
@@ -305,7 +304,7 @@ export function createMcpServer() {
           project.notes ?? "(none)",
           "",
           latest
-            ? `Latest handoff (${sessionName(project.code, latest.seq, latest.goal, latest.driver)}):\n${latest.handoff}`
+            ? `Latest handoff (${sessionName(project.code, latest.seq, latest.kind, latest.goal, latest.driver)}):\n${latest.handoff}`
             : "Latest handoff: (none yet)",
           "",
           "Recent sessions:",
@@ -313,7 +312,7 @@ export function createMcpServer() {
             ? sessions
                 .map(
                   (s) =>
-                    `- ${sessionName(project.code, s.seq, s.goal, s.driver)} · ${SESSION_KIND_LABELS[s.kind]} · ${SESSION_STATUS_LABELS[s.status]}${s.branch ? ` · branch ${s.branch}` : ""}`,
+                    `- ${sessionName(project.code, s.seq, s.kind, s.goal, s.driver)} · ${SESSION_STATUS_LABELS[s.status]} · ${s.createdAt.toISOString().slice(0, 10)}${s.branch ? ` · branch ${s.branch}` : ""}`,
                 )
                 .join("\n")
             : "(none)",
@@ -329,7 +328,7 @@ export function createMcpServer() {
         "Log a new numbered chat or Code session on a project and get the exact name to give this chat. Ask the person for a short goal and whether it is a Chat or Code session first.",
       inputSchema: {
         code: z.string(),
-        goal: z.string().min(1).max(80).describe("Short goal, a few words"),
+        goal: z.string().min(1).max(80).describe("Goal that starts with a verb, 2 to 4 words. If this chat begins a new phase, start it with \"phase N:\"."),
         kind: z.enum(["CHAT", "CODE"]).optional().describe("Default CHAT"),
         driver: personEnum.optional().describe("Who is driving this session, default is the baton holder"),
         url: z.string().optional(),
@@ -347,7 +346,13 @@ export function createMcpServer() {
         url,
         branch,
       });
-      return reply(`Session ${session.seq} logged. Name this chat exactly:\n${name}`);
+      const previous = await db.session.findUnique({
+        where: { projectId_seq: { projectId: project.id, seq: session.seq - 1 } },
+      });
+      const continues = previous
+        ? `\nContinues: ${sessionName(project.code, previous.seq, previous.kind, previous.goal, previous.driver)}`
+        : "\nThis is the first logged session.";
+      return reply(`Session ${session.seq} logged. Name this chat exactly:\n${name}${continues}`);
     },
   );
 

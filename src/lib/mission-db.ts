@@ -41,7 +41,7 @@ export async function createSession(input: {
         branch: input.branch || null,
       },
     });
-    return { session, project, name: sessionName(project.code, seq, session.goal, session.driver) };
+    return { session, project, name: sessionName(project.code, seq, session.kind, session.goal, session.driver) };
   });
 }
 
