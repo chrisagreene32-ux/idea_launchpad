@@ -23,6 +23,7 @@ export type IdeaView = {
   outcome: string | null;
   claudeProjectUrl: string | null;
   brief: string | null;
+  notes: string | null;
   archivedAt: string | null;
   createdAt: string;
 };
@@ -109,6 +110,12 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
         <details>
           <summary style={{ cursor: "pointer", fontSize: 14 }}>Brief</summary>
           <p style={{ whiteSpace: "pre-wrap", fontSize: 14, margin: "8px 0 0" }}>{idea.brief}</p>
+        </details>
+      )}
+      {idea.notes && (
+        <details>
+          <summary style={{ cursor: "pointer", fontSize: 14 }}>Notes</summary>
+          <p style={{ whiteSpace: "pre-wrap", fontSize: 14, margin: "8px 0 0" }}>{idea.notes}</p>
         </details>
       )}
       {starting && !idea.claudeProjectUrl && (

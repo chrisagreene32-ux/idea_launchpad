@@ -9,5 +9,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!login|api/health|_next/static|_next/image|favicon.ico).*)"],
+  // The connector endpoints do their own checks: OAuth uses the app password,
+  // /api/mcp needs a bearer token.
+  matcher: ["/((?!login|oauth|api/health|api/mcp|\\.well-known|_next/static|_next/image|favicon.ico).*)"],
 };

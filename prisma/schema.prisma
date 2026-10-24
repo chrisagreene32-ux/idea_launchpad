@@ -46,7 +46,30 @@ model Idea {
   outcome          Outcome?
   claudeProjectUrl String?
   brief            String?
+  notes            String?
   archivedAt       DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @default(now()) @updatedAt
+}
+
+model OAuthClient {
+  id           String   @id
+  name         String?
+  redirectUris String[]
+  createdAt    DateTime @default(now())
+}
+
+model OAuthCode {
+  codeHash      String   @id
+  clientId      String
+  redirectUri   String
+  codeChallenge String
+  expiresAt     DateTime
+}
+
+model OAuthRefreshToken {
+  tokenHash String   @id
+  clientId  String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
