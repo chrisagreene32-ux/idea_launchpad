@@ -9,9 +9,10 @@ Last updated: 2026-10-24
 - Chat names now read `SCHED-014 · Code · goal · K`; chain shows dates; start_session says which chat it continues
 - Start prompt per logged session opens with a chat-title line, so a new chat gets its name automatically (title trick found by Chris)
 - LAUNCH-001: Mission Control verified. Typecheck and build pass after one small type fix on /mission. Migration matches the schema exactly. Draft PR #8 opened into main.
+- Connector gained add_project and add_idea (so a mid-chat /mission-log skill can save new projects and ideas). Added after the LAUNCH-001 verification, so not yet typechecked.
 
 ## In progress
-- Mission Control is waiting on review and merge (draft PR #8). Not yet tried in a browser.
+- Mission Control is waiting on review and merge (draft PR #8). Not yet tried in a browser. The add_project and add_idea tools still need a typecheck and build.
 
 ## Open branches
 
