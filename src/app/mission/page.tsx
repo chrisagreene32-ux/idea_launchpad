@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ProjectStatus } from "@prisma/client";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import CopyButton from "@/components/CopyButton";
@@ -151,7 +152,7 @@ function ProjectRow({
     id: string;
     code: string;
     name: string;
-    status: string;
+    status: ProjectStatus;
     holder: string;
     deadline: Date | null;
     nextAction: string | null;
