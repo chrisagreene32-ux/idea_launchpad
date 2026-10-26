@@ -9,7 +9,7 @@ import CopyButton from "./CopyButton";
 import OptionalFields from "./OptionalFields";
 import StartLink from "./StartLink";
 import StartPanel from "./StartPanel";
-import { buttonStyle, ghostButtonStyle, inputStyle } from "./ui";
+import { buttonStyle, cardStyle as woodCard, ghostButtonStyle, inputStyle } from "./ui";
 
 export type IdeaView = {
   id: string;
@@ -34,8 +34,7 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
   const [starting, setStarting] = useState(false);
 
   const cardStyle = {
-    background: "#1f2937",
-    borderRadius: 12,
+    ...woodCard,
     padding: 14,
     display: "grid",
     gap: 8,
@@ -86,7 +85,7 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
   return (
     <article style={cardStyle}>
       <p style={{ margin: 0, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{idea.text}</p>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, fontSize: 13, color: "#9ca3af" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, fontSize: 13, color: "#d2b48c" }}>
         {idea.archivedAt && idea.outcome ? (
           <span>🗄️ {OUTCOME_LABELS[idea.outcome]} {new Date(idea.archivedAt).toLocaleDateString()} ·</span>
         ) : null}

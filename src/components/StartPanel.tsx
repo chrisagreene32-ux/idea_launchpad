@@ -15,7 +15,7 @@ function Field({ label, value }: { label: string; value: string }) {
         style={{
           margin: 0,
           padding: 10,
-          background: "#111827",
+          background: "#24150d",
           borderRadius: 8,
           whiteSpace: "pre-wrap",
           overflowWrap: "anywhere",
@@ -45,7 +45,7 @@ export default function StartPanel({
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <div style={{ display: "grid", gap: 12, background: "#111827", padding: 12, borderRadius: 10 }}>
+    <div style={{ display: "grid", gap: 12, background: "#24150d", padding: 12, borderRadius: 10 }}>
       <strong>Set up the Claude project (one time)</strong>
       <ol style={{ margin: 0, paddingLeft: 18, fontSize: 14, display: "grid", gap: 4 }}>
         <li>In Claude, create a new project and paste in the three items below.</li>
@@ -69,7 +69,7 @@ export default function StartPanel({
           placeholder="https://claude.ai/project/…"
           style={inputStyle}
         />
-        {error && <p style={{ color: "#fca5a5", margin: 0, fontSize: 14 }}>{error}</p>}
+        {error && <p style={{ color: "#ff9d7a", margin: 0, fontSize: 14 }}>{error}</p>}
         <div style={{ display: "flex", gap: 8 }}>
           <button style={buttonStyle}>Save project link</button>
           <button type="button" style={ghostButtonStyle} onClick={onClose}>

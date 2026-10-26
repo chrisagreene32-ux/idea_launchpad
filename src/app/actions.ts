@@ -106,3 +106,10 @@ export async function setProjectLink(id: string, formData: FormData): Promise<st
   revalidatePath("/");
   return null;
 }
+
+export async function changeStatus(id: string, status: string) {
+  if (!(status in Status)) return;
+  await db.idea.update({ where: { id }, data: { status: status as Status } });
+  revalidatePath("/");
+  revalidatePath("/board");
+}

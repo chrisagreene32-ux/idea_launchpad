@@ -27,7 +27,7 @@ export default function StartLink({ projectUrl, prompt }: { projectUrl: string; 
         Start
       </a>
       {copied !== null && (
-        <span style={{ alignSelf: "center", fontSize: 14, color: copied ? "#86efac" : "#fca5a5" }}>
+        <span style={{ alignSelf: "center", fontSize: 14, color: copied ? "#7fe0b0" : "#ff9d7a" }}>
           {copied ? "Prompt copied. Paste it in the chat." : "Copy failed. Tap Copy prompt."}
         </span>
       )}

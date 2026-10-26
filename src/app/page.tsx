@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import CaptureForm from "@/components/CaptureForm";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import IdeaCard from "@/components/IdeaCard";
+import NavTabs from "@/components/NavTabs";
 import { logout } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -55,9 +56,10 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
   return (
     <main style={{ padding: 16, maxWidth: 640, margin: "0 auto", display: "grid", gap: 16 }}>
+      <NavTabs current="list" />
       <CaptureForm />
       <FilterBar filters={filters} tags={tags} projects={projects} />
-      <h2 style={{ margin: "8px 0 0", fontSize: 16, color: "#9ca3af" }}>
+      <h2 style={{ margin: "8px 0 0", fontSize: 16, color: "#d2b48c" }}>
         {ideas.length} {ideas.length === 1 ? "idea" : "ideas"}
         {filtered && " match"}
       </h2>
@@ -69,7 +71,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           }} />
       ))}
       <form action={logout}>
-        <button style={{ background: "none", border: "none", color: "#6b7280", padding: 8 }}>
+        <button style={{ background: "none", border: "none", color: "#b08f63", padding: 8 }}>
           Lock
         </button>
       </form>
