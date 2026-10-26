@@ -147,6 +147,14 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
               <>
                 <StartLink projectUrl={idea.claudeProjectUrl} prompt={interviewPrompt(idea)} />
                 <CopyButton text={interviewPrompt(idea)} label="Copy prompt" />
+                <a
+                  href={idea.claudeProjectUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ ...ghostButtonStyle, textDecoration: "none" }}
+                >
+                  Open project
+                </a>
               </>
             ) : (
               <button style={buttonStyle} onClick={() => setStarting((v) => !v)}>

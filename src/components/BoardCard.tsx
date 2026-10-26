@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { changeStatus } from "@/app/actions";
 import { EFFORT_LABELS, PRIORITY_LABELS, STATUS_LABELS } from "@/lib/labels";
-import { cardStyle, inputStyle } from "./ui";
+import { cardStyle, ghostButtonStyle, inputStyle } from "./ui";
 
 export type BoardIdea = {
   id: string;
@@ -14,6 +14,7 @@ export type BoardIdea = {
   effort: string | null;
   nextStep: string | null;
   hasBrief: boolean;
+  claudeProjectUrl: string | null;
 };
 
 const PRIORITY_COLORS: Record<string, string> = { HIGH: "#ff7a59", MEDIUM: "#f5c542", LOW: "#d2b48c" };
@@ -61,6 +62,16 @@ export default function BoardCard({ idea }: { idea: BoardIdea }) {
         {idea.hasBrief && <Badge color="#fcd34d">Brief</Badge>}
       </div>
       {open && idea.nextStep && <p style={{ margin: 0, fontSize: 14 }}>➡️ {idea.nextStep}</p>}
+      {idea.claudeProjectUrl && (
+        <a
+          href={idea.claudeProjectUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ ...ghostButtonStyle, textDecoration: "none", textAlign: "center", fontSize: 14, padding: "8px 12px" }}
+        >
+          Open project
+        </a>
+      )}
       <select
         aria-label="Move to"
         value={idea.status}
