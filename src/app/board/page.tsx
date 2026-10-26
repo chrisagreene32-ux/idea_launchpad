@@ -80,6 +80,7 @@ export default async function Board() {
                     effort: idea.effort,
                     nextStep: idea.nextStep,
                     hasBrief: !!idea.brief,
+                    claudeProjectUrl: idea.claudeProjectUrl,
                   }}
                 />
               ))}
