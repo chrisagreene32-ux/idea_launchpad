@@ -63,6 +63,35 @@ export function interviewPrompt(idea: StartIdea) {
   ].join("\n");
 }
 
+// A prompt that picks the work back up, matched to where the idea is.
+export function resumePrompt(idea: StartIdea & { status: string }) {
+  const intro = `Let's keep working on my idea "${shorten(idea.text, 120)}" (Idea Launchpad id ${idea.id}). First read it with the Idea Launchpad connector's get_idea tool, including the brief, next step and notes.`;
+  const byStage: Record<string, string> = {
+    INTERVIEWED:
+      "The interview is done. Using the brief, propose a short plan for the smallest useful first version, then walk me through it one step at a time. Save the plan as a note with add_note. When I start building, set the status to Building with set_status.",
+    BUILDING:
+      "We're building it. Summarize where we left off in three short bullets, then help me with the next step.",
+    PARKED:
+      "This idea is parked. In a few lines, remind me what it was and why it might be worth restarting, then ask whether to restart it. If I say yes, set the status to Building.",
+  };
+  return [
+    intro,
+    "",
+    byStage[idea.status] ?? byStage.BUILDING,
+    "",
+    "Keep messages short and ask one thing at a time. When we stop, save a note with add_note saying what we did and the next step. Also remind me once to paste this chat's link into Idea Launchpad (Edit, then Chat link) so Continue reopens this chat.",
+  ].join("\n");
+}
+
+export function isClaudeChatUrl(value: string) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === "claude.ai" && url.pathname.startsWith("/chat/");
+  } catch {
+    return false;
+  }
+}
+
 export function isClaudeProjectUrl(value: string) {
   try {
     const url = new URL(value);

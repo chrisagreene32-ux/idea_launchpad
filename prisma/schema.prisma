@@ -45,6 +45,7 @@ model Idea {
   nextStep         String?
   outcome          Outcome?
   claudeProjectUrl String?
+  chatUrl          String?
   brief            String?
   notes            String?
   archivedAt       DateTime?

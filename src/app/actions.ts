@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Effort, Outcome, Priority, Status } from "@prisma/client";
 import { db } from "@/lib/db";
-import { isClaudeProjectUrl } from "@/lib/start";
+import { isClaudeChatUrl, isClaudeProjectUrl } from "@/lib/start";
 import { parseTags } from "@/lib/tags";
 import {
   SESSION_COOKIE,
@@ -53,6 +53,11 @@ function validProjectUrl(formData: FormData) {
   return url && isClaudeProjectUrl(url) ? url : null;
 }
 
+function validChatUrl(formData: FormData) {
+  const url = String(formData.get("chatUrl") ?? "").trim();
+  return url && isClaudeChatUrl(url) ? url : null;
+}
+
 export async function addIdea(formData: FormData) {
   const text = String(formData.get("text") ?? "").trim();
   if (!text) return;
@@ -72,6 +77,7 @@ export async function updateIdea(id: string, formData: FormData) {
       text,
       ...optionalFields(formData),
       ...(formData.has("claudeProjectUrl") ? { claudeProjectUrl: validProjectUrl(formData) } : {}),
+      ...(formData.has("chatUrl") ? { chatUrl: validChatUrl(formData) } : {}),
       ...(status in Status ? { status: status as Status } : {}),
     },
   });

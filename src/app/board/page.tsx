@@ -81,6 +81,8 @@ export default async function Board() {
                     nextStep: idea.nextStep,
                     hasBrief: !!idea.brief,
                     claudeProjectUrl: idea.claudeProjectUrl,
+                    chatUrl: idea.chatUrl,
+                    tags: idea.tags,
                   }}
                 />
               ))}
