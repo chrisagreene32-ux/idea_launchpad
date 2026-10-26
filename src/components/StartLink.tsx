@@ -5,7 +5,15 @@ import { buttonStyle } from "./ui";
 
 // Opening a chat in a project with the prompt prefilled doesn't work, so Start
 // copies the prompt and opens the project; the prompt just needs pasting.
-export default function StartLink({ projectUrl, prompt }: { projectUrl: string; prompt: string }) {
+export default function StartLink({
+  projectUrl,
+  prompt,
+  label = "Start",
+}: {
+  projectUrl: string;
+  prompt: string;
+  label?: string;
+}) {
   const [copied, setCopied] = useState<boolean | null>(null);
 
   function onClick() {
@@ -24,7 +32,7 @@ export default function StartLink({ projectUrl, prompt }: { projectUrl: string; 
         onClick={onClick}
         style={{ ...buttonStyle, textDecoration: "none" }}
       >
-        Start
+        {label}
       </a>
       {copied !== null && (
         <span style={{ alignSelf: "center", fontSize: 14, color: copied ? "#7fe0b0" : "#ff9d7a" }}>

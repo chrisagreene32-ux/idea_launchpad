@@ -4,7 +4,7 @@ import { useState } from "react";
 import { archiveIdea, deleteIdea, unarchiveIdea, updateIdea } from "@/app/actions";
 import Link from "next/link";
 import { EFFORT_LABELS, OUTCOME_LABELS, PRIORITY_LABELS, STATUS_LABELS } from "@/lib/labels";
-import { interviewPrompt, projectPackage } from "@/lib/start";
+import { interviewPrompt, projectPackage, resumePrompt } from "@/lib/start";
 import CopyButton from "./CopyButton";
 import OptionalFields from "./OptionalFields";
 import StartLink from "./StartLink";
@@ -22,6 +22,7 @@ export type IdeaView = {
   nextStep: string | null;
   outcome: string | null;
   claudeProjectUrl: string | null;
+  chatUrl: string | null;
   brief: string | null;
   notes: string | null;
   archivedAt: string | null;
@@ -63,6 +64,12 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
           name="claudeProjectUrl"
           defaultValue={idea.claudeProjectUrl ?? ""}
           placeholder="Claude project link (https://claude.ai/project/…)"
+          style={inputStyle}
+        />
+        <input
+          name="chatUrl"
+          defaultValue={idea.chatUrl ?? ""}
+          placeholder="Chat link for Continue (https://claude.ai/chat/…)"
           style={inputStyle}
         />
         <select name="status" defaultValue={idea.status} style={inputStyle}>
@@ -142,7 +149,34 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
         </form>
       ) : (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {!idea.archivedAt &&
+          {!idea.archivedAt && idea.status !== "DONE" && (idea.chatUrl || (idea.claudeProjectUrl && idea.status !== "NEW")) ? (
+            <>
+              {idea.chatUrl ? (
+                <a
+                  href={idea.chatUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ ...buttonStyle, textDecoration: "none" }}
+                >
+                  Continue
+                </a>
+              ) : (
+                <StartLink projectUrl={idea.claudeProjectUrl!} prompt={resumePrompt(idea)} label="Continue" />
+              )}
+              <CopyButton text={resumePrompt(idea)} label="Copy prompt" />
+              {idea.claudeProjectUrl && (
+                <a
+                  href={idea.claudeProjectUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ ...ghostButtonStyle, textDecoration: "none" }}
+                >
+                  Open project
+                </a>
+              )}
+            </>
+          ) : (
+            !idea.archivedAt &&
             (idea.claudeProjectUrl ? (
               <>
                 <StartLink projectUrl={idea.claudeProjectUrl} prompt={interviewPrompt(idea)} />
@@ -160,7 +194,8 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
               <button style={buttonStyle} onClick={() => setStarting((v) => !v)}>
                 Start
               </button>
-            ))}
+            ))
+          )}
           <button style={ghostButtonStyle} onClick={() => setEditing(true)}>
             Edit
           </button>
