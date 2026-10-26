@@ -8,7 +8,7 @@ export default function AuthorizeForm({ params, clientName }: { params: Authoriz
   const [error, action, pending] = useActionState(approve, null);
   return (
     <main style={{ padding: 24, maxWidth: 420, margin: "0 auto" }}>
-      <h1>Idea Launchpad</h1>
+      <h1 style={{ fontFamily: "var(--font-heading), system-ui, sans-serif", fontWeight: 400 }}>Allow access 🔑</h1>
       <p>
         <strong>{clientName}</strong> wants to read and update your ideas. Enter your password to allow it.
       </p>
@@ -28,7 +28,7 @@ export default function AuthorizeForm({ params, clientName }: { params: Authoriz
         <button disabled={pending} style={{ ...buttonStyle, padding: 14, fontSize: 18 }}>
           {pending ? "Checking…" : "Allow access"}
         </button>
-        {error && <p style={{ color: "#fca5a5", margin: 0 }}>{error}</p>}
+        {error && <p style={{ color: "#ff9d7a", margin: 0 }}>{error}</p>}
       </form>
     </main>
   );

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { changeStatus } from "@/app/actions";
 import { EFFORT_LABELS, PRIORITY_LABELS, STATUS_LABELS } from "@/lib/labels";
-import { inputStyle } from "./ui";
+import { cardStyle, inputStyle } from "./ui";
 
 export type BoardIdea = {
   id: string;
@@ -16,11 +16,11 @@ export type BoardIdea = {
   hasBrief: boolean;
 };
 
-const PRIORITY_COLORS: Record<string, string> = { HIGH: "#f87171", MEDIUM: "#fbbf24", LOW: "#9ca3af" };
+const PRIORITY_COLORS: Record<string, string> = { HIGH: "#ff7a59", MEDIUM: "#f5c542", LOW: "#d2b48c" };
 
-function Badge({ children, color = "#374151" }: { children: React.ReactNode; color?: string }) {
+function Badge({ children, color = "#6b4426" }: { children: React.ReactNode; color?: string }) {
   return (
-    <span style={{ background: color, borderRadius: 6, padding: "2px 8px", fontSize: 12, color: "#111827", fontWeight: 600 }}>
+    <span style={{ background: color, borderRadius: 6, padding: "2px 8px", fontSize: 12, color: "#24150d", fontWeight: 600 }}>
       {children}
     </span>
   );
@@ -33,8 +33,7 @@ export default function BoardCard({ idea }: { idea: BoardIdea }) {
   return (
     <article
       style={{
-        background: "#1f2937",
-        borderRadius: 10,
+        ...cardStyle,
         padding: 12,
         display: "grid",
         gap: 8,
@@ -57,8 +56,8 @@ export default function BoardCard({ idea }: { idea: BoardIdea }) {
       </p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {idea.priority && <Badge color={PRIORITY_COLORS[idea.priority]}>{PRIORITY_LABELS[idea.priority]}</Badge>}
-        {idea.effort && <Badge color="#a5b4fc">{EFFORT_LABELS[idea.effort]}</Badge>}
-        {idea.project && <Badge color="#6ee7b7">📁 {idea.project}</Badge>}
+        {idea.effort && <Badge color="#8fd3c8">{EFFORT_LABELS[idea.effort]}</Badge>}
+        {idea.project && <Badge color="#a8e063">📁 {idea.project}</Badge>}
         {idea.hasBrief && <Badge color="#fcd34d">Brief</Badge>}
       </div>
       {open && idea.nextStep && <p style={{ margin: 0, fontSize: 14 }}>➡️ {idea.nextStep}</p>}

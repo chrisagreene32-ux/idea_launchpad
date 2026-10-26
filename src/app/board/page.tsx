@@ -1,16 +1,25 @@
 import { db } from "@/lib/db";
 import BoardCard from "@/components/BoardCard";
 import NavTabs from "@/components/NavTabs";
+import { headingFont } from "@/components/ui";
 import { STATUS_LABELS } from "@/lib/labels";
 
 export const dynamic = "force-dynamic";
 
 const COLUMN_COLORS: Record<string, string> = {
-  NEW: "#60a5fa",
-  INTERVIEWED: "#c084fc",
-  BUILDING: "#fbbf24",
-  PARKED: "#9ca3af",
-  DONE: "#34d399",
+  NEW: "#2bb3a3",
+  INTERVIEWED: "#e0457b",
+  BUILDING: "#f5c542",
+  PARKED: "#d2b48c",
+  DONE: "#8bc34a",
+};
+
+const COLUMN_ICONS: Record<string, string> = {
+  NEW: "🌺",
+  INTERVIEWED: "🥥",
+  BUILDING: "🔥",
+  PARKED: "🏝️",
+  DONE: "🗿",
 };
 
 const PRIORITY_RANK: Record<string, number> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
@@ -46,19 +55,19 @@ export default async function Board() {
               style={{
                 flex: "0 0 min(85vw, 300px)",
                 scrollSnapAlign: "start",
-                background: "#111827",
-                border: "1px solid #1f2937",
-                borderTop: `4px solid ${COLUMN_COLORS[status]}`,
+                background: "#24150d",
+                border: "2px solid #6b4426",
+                borderTop: `8px solid ${COLUMN_COLORS[status]}`,
                 borderRadius: 12,
                 padding: 10,
                 display: "grid",
                 gap: 8,
               }}
             >
-              <h2 style={{ margin: 0, fontSize: 16 }}>
-                {label} <span style={{ color: "#9ca3af", fontWeight: 400 }}>{column.length}</span>
+              <h2 style={{ margin: 0, fontSize: 18, fontFamily: headingFont, letterSpacing: 0.5 }}>
+                {COLUMN_ICONS[status]} {label} <span style={{ color: "#d2b48c", fontWeight: 400 }}>{column.length}</span>
               </h2>
-              {column.length === 0 && <p style={{ margin: 0, color: "#6b7280", fontSize: 14 }}>Nothing here</p>}
+              {column.length === 0 && <p style={{ margin: 0, color: "#b08f63", fontSize: 14 }}>Nothing here</p>}
               {column.map((idea) => (
                 <BoardCard
                   key={idea.id}

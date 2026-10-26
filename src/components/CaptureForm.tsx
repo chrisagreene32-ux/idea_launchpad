@@ -29,7 +29,7 @@ export default function CaptureForm() {
         style={{ ...inputStyle, fontSize: 18 }}
       />
       <details>
-        <summary style={{ cursor: "pointer", color: "#9ca3af" }}>More details (optional)</summary>
+        <summary style={{ cursor: "pointer", color: "#d2b48c" }}>More details (optional)</summary>
         <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
           <OptionalFields />
         </div>
