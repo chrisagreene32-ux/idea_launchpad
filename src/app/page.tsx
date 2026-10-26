@@ -3,6 +3,7 @@ import { Status } from "@prisma/client";
 import { db } from "@/lib/db";
 import CaptureForm from "@/components/CaptureForm";
 import FilterBar, { type Filters } from "@/components/FilterBar";
+import HowTo from "@/components/HowTo";
 import IdeaCard from "@/components/IdeaCard";
 import NavTabs from "@/components/NavTabs";
 import { logout } from "./actions";
@@ -57,6 +58,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   return (
     <main style={{ padding: 16, maxWidth: 640, margin: "0 auto", display: "grid", gap: 16 }}>
       <NavTabs current="list" />
+      <HowTo />
       <CaptureForm />
       <FilterBar filters={filters} tags={tags} projects={projects} />
       <h2 style={{ margin: "8px 0 0", fontSize: 16, color: "#d2b48c" }}>
