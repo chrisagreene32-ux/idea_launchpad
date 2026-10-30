@@ -106,7 +106,7 @@ export async function unarchiveIdea(id: string) {
 export async function setProjectLink(id: string, formData: FormData): Promise<string | null> {
   const url = String(formData.get("claudeProjectUrl") ?? "").trim();
   if (url && !isClaudeProjectUrl(url)) {
-    return "That doesn't look like a Claude project link (https://claude.ai/project/…)";
+    return "That doesn't look like a Claude project link (https://claude.ai/project/… or https://claude.ai/code/project/…)";
   }
   await db.idea.update({ where: { id }, data: { claudeProjectUrl: url || null } });
   revalidatePath("/");

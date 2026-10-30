@@ -28,7 +28,7 @@ export default function FilterBar({
           ))}
         <option value="active">{VIEW_LABELS.active} only</option>
       </select>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8 }}>
         <select name="status" defaultValue={filters.status} aria-label="Status" style={inputStyle}>
           <option value="">Any status</option>
           {Object.entries(STATUS_LABELS).map(([v, l]) => (

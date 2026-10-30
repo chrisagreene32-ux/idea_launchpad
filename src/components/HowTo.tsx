@@ -18,6 +18,10 @@ const steps: { title: string; text: string }[] = [
     text: "Claude asks one question at a time, then saves a short brief and its effort and priority estimate to the idea. Turn on the Idea Launchpad connector in that chat so it can save.",
   },
   {
+    title: "Continue",
+    text: "On ideas past the interview, Continue reopens your saved chat, or copies a keep-working prompt for the idea's stage and opens your project.",
+  },
+  {
     title: "Archive",
     text: "Archive an idea when it is shipped, parked or abandoned. It leaves the main list but stays searchable. Show: Archived lists them, and Restore brings one back.",
   },
