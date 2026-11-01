@@ -63,7 +63,7 @@ export default function IdeaCard({ idea }: { idea: IdeaView }) {
         <input
           name="claudeProjectUrl"
           defaultValue={idea.claudeProjectUrl ?? ""}
-          placeholder="Claude project link (https://claude.ai/project/…)"
+          placeholder="Claude project link (claude.ai/project/… or /code/project/…)"
           style={inputStyle}
         />
         <input
