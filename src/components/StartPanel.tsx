@@ -66,7 +66,7 @@ export default function StartPanel({
           name="claudeProjectUrl"
           type="url"
           required
-          placeholder="https://claude.ai/project/…"
+          placeholder="https://claude.ai/project/… or /code/project/…"
           style={inputStyle}
         />
         {error && <p style={{ color: "#ff9d7a", margin: 0, fontSize: 14 }}>{error}</p>}

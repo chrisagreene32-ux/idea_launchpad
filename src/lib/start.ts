@@ -95,7 +95,11 @@ export function isClaudeChatUrl(value: string) {
 export function isClaudeProjectUrl(value: string) {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && url.hostname === "claude.ai" && url.pathname.startsWith("/project/");
+    return (
+      url.protocol === "https:" &&
+      url.hostname === "claude.ai" &&
+      (url.pathname.startsWith("/project/") || url.pathname.startsWith("/code/project/"))
+    );
   } catch {
     return false;
   }
